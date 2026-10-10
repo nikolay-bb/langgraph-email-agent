@@ -413,7 +413,7 @@ def describe_calendar_days(service, dates: List[str], now: Optional[datetime] = 
     naive 09:00, which raised TypeError, and the error path then returned
     made-up events.
 
-    `now` is the clock by default; tests pass a fixed time. Each day is named
+    `now` is the clock by default; a caller can pass a fixed time. Each day is named
     ("Events for Sunday 27-09-2026"), so the model can see which weekday a
     date is. A day before today is not looked up. On today, free time starts
     at the next half hour: on 25 Sep the whole of 09:00 - 17:00 was offered,

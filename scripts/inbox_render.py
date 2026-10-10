@@ -2,7 +2,7 @@
 
 Pure functions and fixed settings. Nothing here calls Telegram or the
 LangGraph server, or reads the bot's memory (bot_data), so each function can
-be tested on its own. telegram_inbox.py, the bot itself, imports what it
+be used on its own. telegram_inbox.py, the bot itself, imports what it
 needs from here. It used to hold all of this too, in one 1,800-line file.
 """
 
