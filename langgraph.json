@@ -1,0 +1,12 @@
+{
+    "dockerfile_lines": [],
+    "graphs": {
+        "email_assistant_hitl_memory_gmail": "./src/email_assistant/email_assistant_hitl_memory_gmail.py:email_assistant",
+        "cron": "./src/email_assistant/cron.py:make_graph",
+        "cleanup": "./src/email_assistant/cleanup.py:graph",
+        "preferences": "./src/email_assistant/preferences_graph.py:graph"
+    },
+    "python_version": "3.11",
+    "env": ".env",
+    "dependencies": ["."]
+}

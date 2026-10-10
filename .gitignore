@@ -1,0 +1,31 @@
+.env
+.secrets/
+*token.json
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+.langgraph_api/
+.DS_Store
+.vscode/
+logs/
+
+# Secrets and sign-in files, under any name a download or a copy can give them
+.env.*
+!.env.example
+secrets.json
+credentials.json
+client_secret*.json
+*.pem
+*.key
+
+# Saved state, lists and logs
+*.pckl
+*.jsonl
+*.log
+
+# Private notes and tool settings
+playbook/
+.claude/
+.cursor/
+.idea/

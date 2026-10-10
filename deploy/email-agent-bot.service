@@ -1,0 +1,20 @@
+# The Telegram bot as a systemd service. One bot process per token: stop this
+# service before the bot runs on a different computer.
+# Replace YOUR_USER with the Linux user that owns the code.
+# Logs:  journalctl -u email-agent-bot -f
+
+[Unit]
+Description=Ambient email agent: Telegram bot
+After=network-online.target email-agent-server.service
+Wants=network-online.target email-agent-server.service
+
+[Service]
+User=YOUR_USER
+WorkingDirectory=/home/YOUR_USER/langgraph-email-agent
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/home/YOUR_USER/.local/bin/uv run --no-sync python scripts/telegram_inbox.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

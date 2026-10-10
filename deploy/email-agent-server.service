@@ -1,0 +1,23 @@
+# The LangGraph server (4 graphs, memory, the cron jobs) as a systemd service.
+# Replace YOUR_USER with the Linux user that owns the code, then:
+#   sudo cp deploy/*.service /etc/systemd/system/ && sudo systemctl daemon-reload
+#   sudo systemctl enable --now email-agent-server email-agent-bot
+# Logs:  journalctl -u email-agent-server -f
+
+[Unit]
+Description=Ambient email agent: LangGraph server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=YOUR_USER
+WorkingDirectory=/home/YOUR_USER/langgraph-email-agent
+Environment=PYTHONUNBUFFERED=1
+# --no-reload: the code changes only on a `git pull`; restart the service after one.
+# --no-sync: start with the installed packages; `uv sync --group bot` installs them.
+ExecStart=/home/YOUR_USER/.local/bin/uv run --no-sync langgraph dev --no-browser --no-reload
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
