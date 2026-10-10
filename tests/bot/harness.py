@@ -29,7 +29,7 @@ import types
 
 from telegram.error import BadRequest
 
-# tests/conftest.py sends the LangSmith traces to the tests' own project.
+# tests/conftest.py sets the LangSmith project of the tests and turns tracing off.
 # pytest loads it for the pytest files; a bot suite is a script, so it is
 # loaded here, before the imports below read .env.
 runpy.run_path(str(pathlib.Path(__file__).resolve().parent.parent / "conftest.py"))

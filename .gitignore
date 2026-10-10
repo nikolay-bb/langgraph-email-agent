@@ -29,3 +29,5 @@ playbook/
 .claude/
 .cursor/
 .idea/
+AGENTS.md
+CLAUDE.md

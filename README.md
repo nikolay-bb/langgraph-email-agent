@@ -75,7 +75,7 @@ uv sync --group bot --group dev
    https://api.telegram.org/bot<token>/getUpdates
    ```
 
-   In the answer, find `"message"`, then `"chat"`, then `"id"`. That number is your chat ID. The bot answers this one chat only: it ignores a message from any other chat and writes that chat's ID to its log.
+   Use a private browser window, so the token does not stay in the browser's history. In the answer, find `"message"`, then `"chat"`, then `"id"`. That number is your chat ID. The bot answers this one chat only: it ignores a message from any other chat and writes that chat's ID to its log.
 
 **It worked when** the answer starts with `{"ok":true` and holds your message. **Most likely mistake:** `"result":[]` means that the bot has no new message. Send it one and load the address again. Do this before step 5: a bot program that runs takes the messages first.
 
@@ -93,10 +93,10 @@ chmod 600 .env
 | `OPENAI_API_KEY` | yes | none | Your OpenAI API key. |
 | `TELEGRAM_BOT_TOKEN` | yes | none | The token from @BotFather. |
 | `TELEGRAM_CHAT_ID` | yes | none | The chat ID from step 2, a whole number. |
-| `LANGSMITH_TRACING` | no | `false` in `.env.example` | `true` sends a record of each run to LangSmith, the email text included. It needs the key below. |
+| `LANGSMITH_TRACING` | no | `false` in `.env.example` | `true` sends a record of each run to LangSmith, the email text included. It needs the key below. Keep the line in `.env`: with a key and no such line, the server switches tracing on. |
 | `LANGSMITH_API_KEY` | with tracing | empty | Your LangSmith key. |
 | `LANGSMITH_PROJECT` | no | `langgraph-email-agent` | The LangSmith project that gets the records. |
-| `LANGSMITH_ENDPOINT` | no | `https://eu.api.smith.langchain.com` | The region of your LangSmith account. The example is the EU; the US is `https://api.smith.langchain.com`. A key works in its own region only. |
+| `LANGSMITH_ENDPOINT` | no | the US endpoint | The region of your LangSmith account. For an EU account, set `https://eu.api.smith.langchain.com` (the line is in `.env.example`, switched off). A key works in its own region only. |
 | `LANGGRAPH_URL` | no | `http://127.0.0.1:2024` | Where the bot finds the server. |
 | `TELEGRAM_POLL_SECONDS` | no | `5` | How often the bot asks the server for waiting emails. |
 | `TELEGRAM_ENABLE_EDIT` | no | `0` | `1` adds an Edit button to the cards. |
@@ -266,13 +266,13 @@ Three rules:
 
 ## Security: read this before you run it
 
-- **The server has no sign-in.** `langgraph dev` is a development server. Each program that can reach its port can read the stored emails and can approve an action that waits. Keep it on `127.0.0.1`, which is its default. Never use `--host 0.0.0.0` or `--tunnel`.
+- **The server has no sign-in.** `langgraph dev` is a development server. Each program that can reach its port can read the stored emails and can approve an action that waits. Keep it on `127.0.0.1`, which is its default. Never use `--host 0.0.0.0` or `--tunnel`. On a computer with a browser, a web page that you open can also call this port: one more reason to run the agent on a machine with no browser.
 - **Keep each inbound port closed.** The bot uses long polling and the server only calls out to Google and OpenAI, so the machine needs no open inbound port.
 - **`token.json` is a key to the mailbox.** A person who has it can read and send your email and change your calendar. `secrets.json` and `.env` are secrets too. Never commit them. `.env`, `.secrets/`, `logs/` and `.langgraph_api/` are on the ignore list of git: do not take them off it.
 - **Personal data stays on the machine** in `.langgraph_api/` (email text, drafts, profiles), in `logs/` and in the server log (senders and subjects). Protect the machine and its backups.
 - **LangSmith gets the text, if you switch tracing on.** With `LANGSMITH_TRACING=true`, the text of each email, each draft and the calendar data go to LangSmith. It is `false` in `.env.example`. After a change in `.env`, start the server again. The LangGraph tool also sends its own usage data; [LangChain's page](https://docs.langchain.com/langsmith/data-storage-and-privacy) says what it sends and how to turn it off.
 - **OpenAI gets the text.** The agent sends the email, its earlier emails and the calendar data to OpenAI to get a draft. Read [OpenAI's page on your data](https://developers.openai.com/api/docs/guides/your-data).
-- **The agent reads untrusted email.** An email can hold text that tries to give the model orders. The calendar check runs with no approval; each action that sends or changes something waits for you. So read each card before you press Accept: the text, the Cc line and the attendees. The model cannot type a To address: a reply goes to the sender of an email that is in the mailbox. It can add Cc addresses, and the card shows them.
+- **The agent reads untrusted email.** An email can hold text that tries to give the model orders. Three things happen with no approval card: the calendar check, the "read" mark on an email when the work on it ends, and a change to a stored profile after you press Respond (the bot shows you that change). Each email that is sent and each meeting that is made, moved or cancelled waits for you. So read each card before you press Accept: the text, the Cc line and the attendees. The model cannot type a To address: a reply goes to the sender of an email that is in the mailbox. It can add Cc addresses, and the card shows them.
 - **Set a spend limit** in your OpenAI account ([OpenAI's guide](https://developers.openai.com/api/docs/guides/spend-limits)).
 - **Keep the mailbox address, the chat ID and the bot token private.** A person who has the token controls the bot. If it leaks, send `/revoke` to @BotFather, put the new token in `.env`, and start the bot again.
 
