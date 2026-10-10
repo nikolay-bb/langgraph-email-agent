@@ -1,0 +1,51 @@
+# Runs on each pull request and each push to main. It installs the project
+# and checks that the four graphs and the Telegram bot load. It makes no call
+# to OpenAI, Google or Telegram: the three keys below are placeholders.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+# A new push stops the older run of the same branch, to save minutes.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      OPENAI_API_KEY: placeholder
+      TELEGRAM_BOT_TOKEN: "1:placeholder"
+      TELEGRAM_CHAT_ID: "12345"
+    steps:
+      - uses: actions/checkout@v7
+
+      # setup-uv has no short tags (v10) since v8: use an exact release.
+      - uses: astral-sh/setup-uv@v10.2.0
+
+      - name: Install (fails if uv.lock is out of date)
+        run: uv sync --locked --group bot
+
+      - name: Compile each Python file
+        run: uv run --locked --group bot python -m compileall -q src scripts
+
+      - name: Load the four graphs in langgraph.json
+        run: |
+          uv run --locked --group bot python - <<'EOF'
+          import importlib, json
+          for name, path in json.load(open("langgraph.json"))["graphs"].items():
+              file, attr = path.split(":")
+              module = file.removeprefix("./src/").removesuffix(".py").replace("/", ".")
+              getattr(importlib.import_module(module), attr)
+              print("loaded", name)
+          EOF
+
+      - name: Load the Telegram bot
+        run: uv run --locked --group bot python -c "import sys; sys.path.insert(0, 'scripts'); import telegram_inbox; print('loaded the bot')"
