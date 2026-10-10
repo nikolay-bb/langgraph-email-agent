@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 """
-Simple Gmail ingestion script based directly on test.ipynb that works with LangSmith tracing.
+Gmail ingestion: reads new email from Gmail and starts one LangGraph run for each.
 
-This script provides a minimal implementation for ingesting emails to the LangGraph server,
-with reliable LangSmith tracing.
+Run it by hand for a one-off check, or let the cron job (setup_cron.py) run it
+on a schedule.
 """
 
 import uuid
@@ -106,7 +106,7 @@ def thread_id_for(message_id: str) -> str:
     Keyed on the message, not on Gmail's conversation (threadId). A reply in a
     conversation is a new email, so it gets its own thread. When the key was
     the conversation, a reply was added to a finished run's messages, and the
-    model call failed (phone test 10).
+    model call failed.
     """
     return str(uuid.UUID(hex=hashlib.md5(message_id.encode("UTF-8")).hexdigest()))
 

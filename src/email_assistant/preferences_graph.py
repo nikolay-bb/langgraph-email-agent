@@ -78,8 +78,8 @@ def read_current(store: BaseStore, namespace: str) -> str:
 def rewrite(namespace: str, current: str, instruction: str) -> str:
     """One model call: the whole profile with the instruction applied.
 
-    A module-level function on purpose, so tests can swap it for a stub and
-    exercise the graph without a model.
+    A module-level function on purpose, so it can be swapped for a stub to
+    run the graph without a model.
     """
     llm = init_chat_model("openai:gpt-4.1", temperature=0.0).with_structured_output(UserPreferences)
     result = llm.invoke([
@@ -147,5 +147,5 @@ builder.add_edge("show", END)
 builder.add_edge("propose", END)
 builder.add_edge("apply", END)
 
-# The server injects its own store; tests compile `builder` with an InMemoryStore.
+# The server injects its own store. To run it alone, compile `builder` with an InMemoryStore.
 graph = builder.compile()

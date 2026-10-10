@@ -360,8 +360,8 @@ def load_list_state() -> dict:
 def save_list_state(context: ContextTypes.DEFAULT_TYPE) -> None:
     """Record the current list, so a restart can pick up where this run left off.
 
-    Only the real bot writes it (main() sets `persist_state`). The test suites
-    never do, so they cannot overwrite the running bot's record.
+    Only the real bot writes it (main() sets `persist_state`). Any other caller
+    leaves it alone, so it cannot overwrite the running bot's record.
     """
     if not context.bot_data.get("persist_state"):
         return
@@ -574,7 +574,7 @@ class BotData(TypedDict):
     focus: str | None               # the thread you have open; the list waits until it is done
     polling: bool                   # a poll is running
     poll_again: bool                # a poll was asked for while one ran
-    persist_state: bool             # only the real bot writes STATE_FILE; tests never do
+    persist_state: bool             # only the real bot writes STATE_FILE
     net_errors: int                 # Telegram reconnects so far (on_error)
 
 

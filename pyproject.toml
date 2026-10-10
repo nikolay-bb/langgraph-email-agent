@@ -17,19 +17,13 @@ dependencies = [
 ]
 
 [dependency-groups]
-# The Telegram front end is a separate process from the graph. Keeping it in its
-# own group means `uv sync` still installs a lean runtime, and the bot's
-# dependencies never reach a deployed graph image.
+# The Telegram bot is a separate process from the graph. Keeping it in its own
+# group means `uv sync` still installs a lean runtime, and the bot's
+# dependencies never reach a deployed graph image. Install it with:
+#   uv sync --group bot
 bot = [
     "python-telegram-bot[job-queue]>=21.0",
     "langgraph-sdk>=0.1.0",
-]
-
-# Test tools. uv installs this group by default; `uv sync --no-dev` leaves it out.
-# The bot's own suites need the `bot` group too:
-#   uv run --group bot --group dev pytest tests -q
-dev = [
-    "pytest>=8.0",
 ]
 
 [build-system]
@@ -41,12 +35,3 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 "*" = ["py.typed"]
-
-[tool.pyright]
-# The bot's two scripts are imported by name in tests/bot/harness.py, which
-# puts scripts/ on the path when it runs. This tells the editor the same.
-extraPaths = ["scripts"]
-
-[tool.pytest.ini_options]
-# No .pytest_cache/ folder. The cache only served --lf and --ff.
-addopts = "-p no:cacheprovider"
